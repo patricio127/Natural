@@ -184,39 +184,26 @@ export default {
   name: "Home",
   mounted: function () {
     this.productos = StorageManager.leerLS();
+    const fetchPromise = fetch(`https://veggie-shop.000webhostapp.com/reviews-api/reviews.php`)
+
+    fetchPromise.then(response => {
+        if (response.ok === true) {
+            return response.json();
+        } else {
+          console.warn("Error geting reviews");
+        }
+    }).then(result => {
+        if (result){
+          this.reseñas = result.reviews;
+        }
+    }).catch(() => {
+        console.warn("Error geting reviews");
+    });
   },
   data: function() {
     return {
       productos: [],
-      reseñas: [
-        {
-          id: 1,
-          rating: 4.1,
-          text: `Muy buen servicio y comida el personal muy gentil y servicial
-                  respondió a todo y ayudó asesoró y fue simpática lo mismo que
-                  el gerente`
-        },
-        {
-          id: 2,
-          rating: 4.5,
-          text: `El sushi es riquisimo! Super fresco y sabroso. Me lo habian
-                  recomendado ya varias personas, y finalmente pude probarlo! Lo
-                  recomiendo y volveria a ir :)`
-        },
-        {
-          id: 3,
-          rating: 4,
-          text: `Hermosa experiencia! Gran calidad de servicio y comida
-                  deliciosa. No veo la hora de volver. Muchas gracias!`
-        },
-        {
-          id: 4,
-          rating: 4.9,
-          text: `Fui directamente a conocer el "bar secreto". La verdad es un
-                  lugar increible. La ambientacion , la decoracion y la atencion
-                  superaron mis expectativas.`
-        }
-      ]
+      reseñas: [],
     }
   }
 };

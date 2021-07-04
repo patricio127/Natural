@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app absolute temporary>
+    <v-navigation-drawer v-model="drawer" app fixed temporary>
       <v-list>
         <v-list-item
           links
@@ -28,9 +28,27 @@
 </template>
 
 <script>
+import StoareManager from './storage-manager'
 export default {
   name: "App",
-
+  mounted: function() {
+    const listaProductos = StoareManager.leerLS();
+    if (!listaProductos || listaProductos.length == 0){
+      const fetchPromise = fetch(`https://veggie-shop.000webhostapp.com/test-data-api/test-data.php`);
+      fetchPromise.then(response => {
+          if (response.ok === true) {
+              return response.json();
+          }
+      }).then(result => {
+          if (result){
+            StoareManager.guardarEnLS(result.listaProductos);
+            location.reload();
+          }
+      }).catch(() => {
+          console.warn("Error geting reviews");
+      });
+    }
+  },  
   data: () => ({
     items: [
       {

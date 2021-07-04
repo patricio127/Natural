@@ -17,6 +17,13 @@
                         <p v-if="validando && codigoRepetido" class="invalid-feedback">El codigo del producto ya existe</p>
                     </v-col>
                     <v-col lg="12">
+                        <v-select
+                        v-model="producto.categoria"
+                        :items="categorias"
+                        label="Categoría"
+                        ></v-select>
+                    </v-col>
+                    <v-col lg="12">
                         <v-text-field
                             v-model="producto.nombre"
                             :rules="nombreRules"
@@ -91,6 +98,12 @@
             imagenRules: [
                 v => !!v || 'Imagen requerida',
             ],
+            categorias: [
+                "Clásicos",
+                "Especiales",
+                "Hot Rolls",
+                "Vegeterianos",
+            ]
         }
     ),
     methods : {

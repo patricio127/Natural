@@ -20,6 +20,7 @@
         return {
             producto: {
                 codigo: '',
+                categoria:'',
                 nombre: '',
                 descripcion: '',
                 precio: '',

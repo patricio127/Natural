@@ -13,26 +13,30 @@
             <v-icon dark>mdi-plus</v-icon>
             </v-btn></router-link>
         </div>
-        <v-row class="encabezado">
-            <v-col lg="1">Codigo</v-col>
-            <v-col lg="1">Imagen</v-col>
-            <v-col lg="2">Nombre</v-col>
-            <v-col lg="5">Descripcion del producto</v-col>
-            <v-col lg="1">Precio</v-col>
-            <v-col lg="2">Acciones</v-col>
-        </v-row>
-        <transition-group tag="ol" enter-active-class="animate__animated animate__bounceInLeft"
-                        leave-active-class=" animate__animated animate__fadeOutRightBig" v-if="productos.length > 0">
-            <li v-for="producto in productos" :key="producto.codigo">
-                <product v-show="editandoCodigo != producto.codigo" :producto="producto"
-                                    @editar="editar($event)" @eliminar="eliminar($event)">
-                </product>
-                <edit v-if="editandoCodigo == producto.codigo" :producto="producto" 
-                                @terminarEdicion="terminarEdicion">
-                </edit>
-            </li>
-        </transition-group>
-        <p v-else>Aún no hay productos</p>
+
+            <v-row class="encabezado d-none d-md-flex">
+                <v-col lg="1">Codigo</v-col>
+                <v-col lg="1">Imagen</v-col>
+                <v-col lg="2">Nombre</v-col>
+                <v-col lg="4">Descripcion</v-col>
+                <v-col lg="1">Categoria</v-col>
+                <v-col lg="1">Precio</v-col>
+                <v-col lg="2">Acciones</v-col>
+            </v-row>
+            <transition-group tag="ol" enter-active-class="animate__animated animate__bounceInLeft"
+                            leave-active-class=" animate__animated animate__fadeOutRightBig" v-if="productos.length > 0">
+                <li v-for="producto in productos" :key="producto.codigo">
+                    <product v-show="editandoCodigo != producto.codigo" :producto="producto"
+                                        @editar="editar($event)" @eliminar="eliminar($event)">
+                    </product>
+                    <edit v-if="editandoCodigo == producto.codigo" :producto="producto" 
+                                    @terminarEdicion="terminarEdicion">
+                    </edit>
+                </li>
+            </transition-group>
+            <p v-else>Aún no hay productos</p>
+
+        
     </div>
 </template>
 <script>
