@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Añadir producto</h2>
-    <router-link to="/" class="nav-link" id="volver">Volver</router-link>
+    <router-link to="/admin" class="nav-link mx-16" id="volver"><v-btn elevation="2" color="secondary">Volver</v-btn> </router-link>
     <sushi-form @guardar="guardar" :producto="producto" 
           :codigoRepetido="codigoRepetido" :modoEdicion="false">
     </sushi-form>

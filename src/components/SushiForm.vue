@@ -1,66 +1,110 @@
 <template>
     <div>
-        <form method="post" id="formulario" @submit.prevent="guardar">
-            <div class="row">
-                <div  class=" col-md-12  col-lg-6">
-                    <div class="col-12" v-if="!modoEdicion">
-                        <label for="codigo" class="form-label">Codigo del producto</label>
-                        <input type="number" v-on:keydown.190.stop.prevent v-on:keydown.188.stop.prevent v-on:keydown.189.stop.prevent
-                        v-on:keydown.109.stop.prevent v-on:keydown.110.stop.prevent  v-on:keydown.107.stop.prevent  
-                        v-model.number="producto.codigo" class="form-control" placeholder="1234" id="codigo" name="codigo" 
-                        :class="{'is-invalid': codigoRepetido}" required>
+        <v-form ref="form" id="formulario" @submit.prevent="guardar" v-model="valid">
+            <v-container>
+                <v-row>
+                <v-col md="12"  lg="6">
+                    <v-col lg="12" v-if="!modoEdicion">
+                        <v-text-field
+                            v-on:keydown.190.stop.prevent v-on:keydown.188.stop.prevent v-on:keydown.189.stop.prevent
+                            v-on:keydown.109.stop.prevent v-on:keydown.110.stop.prevent  v-on:keydown.107.stop.prevent
+                            :rules="codigoRules"
+                            v-model.number="producto.codigo"
+                            label="Codigo del producto"
+                            id="codigo" name="codigo"
+                            required
+                        ></v-text-field>
                         <p v-if="validando && codigoRepetido" class="invalid-feedback">El codigo del producto ya existe</p>
-                    </div>
-                    <div class="col-12">
-                        <label for="nombre" class="form-label">Nombre del Producto</label>
-                        <input type="text" v-model="producto.nombre" class="form-control" 
-                        placeholder="Nombre del producto" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <input type="textarea" v-model="producto.descripcion" class="form-control" 
-                        placeholder="Descripcion" id="descripcion" name="descripcion" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="precio" class="form-label">Precio</label>
-                        <input type="number" v-model.number="producto.precio" class="form-control" 
-                        id="precio" name="precio" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="url-imagen" class="form-label">Ingrese la URL de la imagen de internet</label>
-                        <input type="text" v-model="producto.urlImagen" class="form-control" id="url-imagen" 
-                        name="url-imagen" required>
-                    </div>
-                </div>
-                <div  class="col-md-12  col-lg-6">
+                    </v-col>
+                    <v-col lg="12">
+                        <v-text-field
+                            v-model="producto.nombre"
+                            :rules="nombreRules"
+                            label="Nombre del producto"
+                            id="nombre" name="nombre"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col lg="12">
+                        <v-text-field
+                            v-model="producto.descripcion"
+                            :rules="descripcionRules"
+                            label="Descripcion"
+                            id="descripcion" name="descripcion"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col lg="12">
+                        <v-text-field
+                            v-model.number="producto.precio"
+                            :rules="precioRules"
+                            label="Precio"
+                            id="precio" name="precio"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col lg="12">
+                        <v-text-field
+                            v-model.number="producto.urlImagen"
+                            :rules="imagenRules"
+                            label="Ingrese la URL de la imagen de internet"
+                            id="url-imagen" name="url-imagen"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                </v-col>
+                <v-col md="12"  lg="6">
                     <p>Vista previa de la imagen</p>
                     <div class="vista-previa">
-                        <img :src='producto.urlImagen' v-show="producto.urlImagen" alt='vista previa de la imagen'>
+                        <v-img heigth="300" :src='producto.urlImagen' v-show="producto.urlImagen" alt='vista previa de la imagen'></v-img>
                     </div>
-                </div>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary mx-auto px-5 ">
+                </v-col>
+            </v-row>
+            <v-col lg="12">
+                <v-btn elevation="2" type="submit" color="primary">
                     {{modoEdicion ? "Listo" : "Guardar"}}
-                </button>
-            </div>
-        </form>
+                </v-btn>
+            </v-col>
+            </v-container>
+        </v-form>
     </div>
 </template>
 
 <script>
   export default {
     props:['producto','codigoRepetido', 'modoEdicion'],
-    data:function(){
-        return {
+    data:() =>({
+            valid: false,
             validando : false,
+            codigoRules: [
+                v => !!v || 'Código requerido',
+            ],
+            nombreRules: [
+                v => !!v || 'Nombre requerido',
+            ],
+            descripcionRules: [
+                v => !!v || 'Descripción requerida',
+            ],
+            precioRules: [
+                v => !!v || 'Precio requerido',
+            ],
+            imagenRules: [
+                v => !!v || 'Imagen requerida',
+            ],
         }
-    },
+    ),
     methods : {
-        guardar:function(){
-            this.validando = true;
-            this.$emit('guardar');
+        guardar: function() {
+            if (this.$refs.form.validate()) {
+                this.validando = true;
+                this.$emit('guardar');
+            }
         }
     }
   }
 </script>
+<style scoped>
+.invalid-feedback {
+    color: red;
+}
+</style>
