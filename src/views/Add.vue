@@ -24,7 +24,7 @@
                 nombre: '',
                 descripcion: '',
                 precio: '',
-                urlImagen: '',
+                imagen: '',
             },
             codigoRepetido: false,
             productos: [],
@@ -41,15 +41,30 @@
                     yaExiste = true;
                 }
             });
+            StorageManager.leerPendientesEliminarDeLS().forEach(pendiente => {
+                if(pendiente == codigo){
+                    yaExiste = true;
+                }
+            });
             return yaExiste;
         },
         guardar:function() {
             if(this.codigoExistente(this.producto.codigo)){
                 this.codigoRepetido=true;
             }else {
-                this.productos.push(this.producto);
-                StorageManager.guardarEnLS(this.productos);
-                this.$router.push('/admin');
+                //this.productos.push(this.producto);
+                StorageManager.guardarEnBD(this.producto).then((response)=>{
+                  if(response.ok){
+                    this.$router.push('/admin');
+                  }
+                }).catch(()=>{
+                  this.producto.imagen = URL.createObjectURL(document.querySelector("input[type='file']").files[0]);
+                  StorageManager.guardarPendienteEnLS(this.producto);
+                  this.productos.push(this.producto);
+                  StorageManager.guardarEnLS(this.productos);
+                  this.$router.push('/admin');
+                });
+                
             }
         }
     },

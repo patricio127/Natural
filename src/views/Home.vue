@@ -59,7 +59,7 @@
         <v-row>
           <v-card class="my-4 mx-auto" max-width="18rem" v-for="producto in productos" :key="producto.codigo">
             <div class="contenedor-img">
-              <v-img contain :src=producto.urlImagen alt="Imagen"></v-img>
+              <v-img contain :src='apiPath +"/Natural/api/" + "imagenes/" + producto.codigo + producto.imagen' alt="Imagen"></v-img>
             </div>
             <v-card-title>{{producto.nombre | mayuscula}}</v-card-title>
             <v-card-text>{{producto.descripcion | mayuscula}}</v-card-text>
@@ -124,7 +124,7 @@
               <v-card-text >
                 <v-row align="center" class="mx-1">
                   <v-rating
-                    :value=review.rating
+                    :value=parseFloat(review.rating)
                     color="amber"
                     dense
                     half-increments
@@ -141,6 +141,11 @@
           </v-col>
 
         </v-row>
+        <v-row class="reviews-button-container">
+          <router-link to="/add-review" class="nav-link" >
+            <v-btn color="primary" elevation="8">Dejanos tu reseña</v-btn> 
+          </router-link>
+        </v-row> 
       </section>
       <footer>
         <div>
@@ -183,8 +188,14 @@ import StorageManager from "../storage-manager";
 export default {
   name: "Home",
   mounted: function () {
-    this.productos = StorageManager.leerLS();
-    const fetchPromise = fetch(`https://veggie-shop.000webhostapp.com/reviews-api/reviews.php`)
+    StorageManager.leerBD().then(productos => {
+        this.productos = productos;
+        StorageManager.guardarEnLS(this.productos);
+    }).catch(()=>{
+        this.productos = StorageManager.leerLS();
+    });
+
+    const fetchPromise = fetch(`${this.apiPath}/Natural/api/reviews.php`);
 
     fetchPromise.then(response => {
         if (response.ok === true) {
@@ -194,7 +205,7 @@ export default {
         }
     }).then(result => {
         if (result){
-          this.reseñas = result.reviews;
+          this.reseñas = result;
         }
     }).catch(() => {
         console.warn("Error geting reviews");
@@ -204,6 +215,7 @@ export default {
     return {
       productos: [],
       reseñas: [],
+      apiPath: StorageManager.API_PATH,
     }
   }
 };
@@ -262,6 +274,17 @@ export default {
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
+.reviews-button-container a{
+  width: 350px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.reviews-button-container a button{
+  width: 100%;
+}
 footer {
     background-image: url('../assets/footer.jpg');
     padding: 50px 0 40px;

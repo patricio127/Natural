@@ -51,19 +51,19 @@
                         ></v-text-field>
                     </v-col>
                     <v-col lg="12">
-                        <v-text-field
-                            v-model.number="producto.urlImagen"
-                            :rules="imagenRules"
-                            label="Ingrese la URL de la imagen de internet"
-                            id="url-imagen" name="url-imagen"
-                            required
-                        ></v-text-field>
+                        <v-file-input
+                            :rules="modoEdicion ? undefined : imagenRules"
+                            v-on:change="onFileChange($event)"
+                            label="Imagen del producto"
+                            id="imagen" name="imagen"
+                            :required="!modoEdicion"
+                        ></v-file-input>
                     </v-col>
                 </v-col>
                 <v-col md="12"  lg="6">
                     <p>Vista previa de la imagen</p>
                     <div class="vista-previa">
-                        <v-img heigth="300" :src='producto.urlImagen' v-show="producto.urlImagen" alt='vista previa de la imagen'></v-img>
+                        <v-img max-height="400" contain :src='imgPreviewURL' v-show="imgPreviewURL" alt='vista previa de la imagen'></v-img>
                     </div>
                 </v-col>
             </v-row>
@@ -78,11 +78,14 @@
 </template>
 
 <script>
-  export default {
+import StorageManager from "../storage-manager";
+export default {
     props:['producto','codigoRepetido', 'modoEdicion'],
     data:() =>({
+            apiPath: StorageManager.API_PATH,
             valid: false,
             validando : false,
+            imgPreviewURL: undefined,
             codigoRules: [
                 v => !!v || 'Código requerido',
             ],
@@ -112,6 +115,14 @@
                 this.validando = true;
                 this.$emit('guardar');
             }
+        },
+        onFileChange(file) {
+            this.imgPreviewURL = URL.createObjectURL(file);
+        }
+    },
+    mounted: function(){
+        if (this.modoEdicion) {
+            this.imgPreviewURL = this.apiPath + "/Natural/api/" + "imagenes/" + this.producto.codigo + this.producto.imagen;
         }
     }
   }

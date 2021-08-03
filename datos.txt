@@ -1,0 +1,9 @@
+* CARRERA: Diseño web
+* MATERIA: Aplicaciones para Dispositivos Móviles
+* COMISIÓN:A 
+* TURNO: Noche
+* AÑO: 2021
+* CUATRIMESTRE: Tercero
+* DOCENTE: Mabel GARCIA
+* ALUMNO: HUANG Patricio
+* CARÁCTER DE ENTREGA: Final

@@ -4,6 +4,9 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import AnimateCSS from 'animate.css';
 
+const server_url = 'https://veggie-shop.000webhostapp.com/reviews-api/';
+console.log(server_url);
+
 Vue.config.productionTip = false
 
 Vue.filter('mayuscula', function(texto){

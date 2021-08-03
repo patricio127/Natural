@@ -26,10 +26,10 @@
             <transition-group tag="ol" enter-active-class="animate__animated animate__bounceInLeft"
                             leave-active-class=" animate__animated animate__fadeOutRightBig" v-if="productos.length > 0">
                 <li v-for="producto in productos" :key="producto.codigo">
-                    <product v-show="editandoCodigo != producto.codigo" :producto="producto"
+                    <product v-show="editandoProducto != producto" :producto="producto"
                                         @editar="editar($event)" @eliminar="eliminar($event)">
                     </product>
-                    <edit v-if="editandoCodigo == producto.codigo" :producto="producto" 
+                    <edit v-if="editandoProducto == producto" :producto="producto" 
                                     @terminarEdicion="terminarEdicion">
                     </edit>
                 </li>
@@ -50,26 +50,75 @@
       Edit,
       Product,
     },
-    mounted: function() {
-          this.productos = StorageManager.leerLS();
+    mounted: async function() {
+        StorageManager.leerBD().then(productos => {
+            this.productos = productos;
+            StorageManager.guardarEnLS(this.productos);
+        }).catch(()=>{
+            this.productos = StorageManager.leerLS();
+        });
+        console.log('mounted en Admin');
+        console.log(`hay data pendiente ${StorageManager.hayDataPendiente()}`);
+        if (StorageManager.hayDataPendiente()) {
+            console.log(navigator.onLine);
+            if (navigator.onLine) {
+                console.log('ya estaba online y habia data pendiente');
+                await StorageManager.actualizarBDConDataOffline();
+                StorageManager.leerBD().then(productos => {
+                    this.productos = productos;
+                    StorageManager.guardarEnLS(this.productos);
+                })
+            } 
+        }
+        window.addEventListener('online', async () => {
+            console.log('Evento online!');
+            if (StorageManager.hayDataPendiente()) {
+                await StorageManager.actualizarBDConDataOffline();
+                StorageManager.leerBD().then(productos => {
+                    this.productos = productos;
+                    StorageManager.guardarEnLS(this.productos);
+                })
+            }
+        });
     },
     methods: {
         eliminar: function(producto) {
-            this.productos.splice(this.productos.indexOf(producto),1);
-            StorageManager.guardarEnLS(this.productos);
+            StorageManager.eliminarDeBD(producto).then(response => {
+                if (response.ok) {
+                    this.productos.splice(this.productos.indexOf(producto), 1);
+                }
+            }).catch(()=>{
+                console.log('catch del eliminar');
+                StorageManager.guardarPendienteEliminarEnLS(producto);
+                this.productos.splice(this.productos.indexOf(producto), 1);
+                StorageManager.guardarEnLS(this.productos);
+            });
         },
         editar: function(producto) {
-            this.editandoCodigo = producto.codigo;
+            this.editandoProducto = producto;
         },
         terminarEdicion: function() {
-            StorageManager.guardarEnLS(this.productos);
-            this.editandoCodigo = undefined;
+            StorageManager.guardarEnBD(this.editandoProducto).then(response => {
+                if (response.ok) {
+                    if (document.querySelector("input[type='file']").files.length > 0) {
+                        this.editandoProducto.imagen = document.querySelector("input[type='file']").files[0].name;
+                    }
+                    this.editandoProducto = undefined;
+                }
+            }).catch(()=>{
+                if (document.querySelector("input[type='file']").files.length > 0) {
+                    this.producto.imagen = URL.createObjectURL(document.querySelector("input[type='file']").files[0]);
+                }
+                StorageManager.guardarPendienteEnLS(this.editandoProducto);
+                StorageManager.guardarEnLS(this.productos);
+                this.editandoProducto = undefined;
+            });
         },
     },
     data: function() {
         return {
             productos:[],
-            editandoCodigo:undefined,
+            editandoProducto:undefined,
         }
     }
   }
